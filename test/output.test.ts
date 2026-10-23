@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { buildModel, checkRules, containerDiagram, loadConfig, renderMarkdown, renderStructurizr } from '../src/index.js';
+import { buildModel, checkRules, containerDiagram, loadConfig, renderMarkdown, renderStructurizr, renderViewer } from '../src/index.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const shop = join(here, '../examples/shop');
@@ -64,5 +64,18 @@ describe.skipIf(!existsSync(cli))('cli', () => {
     const res = run(['check', '--up-to-date', 'docs/architecture.md'], root);
     expect(res.stdout).toBe('No violations.\n');
     expect(res.status).toBe(0);
+  });
+});
+
+describe('viewer', () => {
+  it('writes a self-contained page with every package and violation', () => {
+    const html = renderViewer(model, config, violations);
+    expect(html).not.toMatch(/<script[^>]+src=|<link[^>]+href=/);
+    for (const c of model.containers) expect(html).toContain(`data-id="pkg:${c.name}"`);
+    expect(html).toContain('class="edge edge-violation" data-from="pkg:@shop/domain" data-to="pkg:@shop/db"');
+    expect(html).toContain('data-to="ext:postgresql"');
+    const data = JSON.parse(html.match(/<script type="application\/json" id="data">(.*?)<\/script>/s)![1]!);
+    expect(data.violations).toHaveLength(violations.length);
+    expect(data.details['pkg:@shop/api'].externals.map((e: { name: string }) => e.name)).toContain('PostgreSQL');
   });
 });

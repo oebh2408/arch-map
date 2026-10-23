@@ -1,12 +1,18 @@
+<img src="docs/diagram.jpg" alt="Arch Map: workspace packages and imports go in, rules are checked, a Mermaid architecture document comes out" width="100%">
+
 # arch-map
 
 [![ci](https://github.com/oebh2408/arch-map/actions/workflows/ci.yml/badge.svg)](https://github.com/oebh2408/arch-map/actions/workflows/ci.yml)
-![license](https://img.shields.io/badge/license-MIT-blue)
-![node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)
+![node](https://img.shields.io/badge/node-%E2%89%A518-6FF2C6)
+![license](https://img.shields.io/badge/license-MIT-A98BFF)
 
-Architecture diagrams generated from the code of a TypeScript monorepo, following the [C4 model](https://c4model.com), plus rules that fail the build when someone imports across a boundary they should not.
+Architecture diagrams of a monorepo are usually drawn by hand once and then go out of date: a new package is added, the web app starts importing the database layer directly, two libraries end up depending on each other. Nobody notices until the diagram is needed and turns out to be wrong.
 
-Hand-drawn architecture diagrams go stale the week after they are drawn. arch-map reads the workspace packages, their `package.json` files and every import, and writes `docs/architecture.md` with Mermaid diagrams that GitHub renders in place. A CI step regenerates the file and fails if the committed version is out of date, so the diagrams change in the same pull request as the code.
+arch-map builds the diagrams from the code. It reads the workspace packages, their `package.json` files and every import, and writes `docs/architecture.md` with [C4](https://c4model.com) diagrams in Mermaid, which GitHub renders in place. It also checks rules (cycles, undeclared dependencies, layers, forbidden imports) and a CI step fails when the committed document is out of date, so the diagrams change in the same pull request as the code. `arch-map view` writes an interactive version of the package graph as a single HTML file.
+
+<img src="docs/demo.svg" alt="Terminal demo: arch-map writes the architecture document for a small monorepo and finds 5 errors and 1 warning, each with its file and rule" width="100%">
+
+<sub>Run on [examples/shop](examples/shop), a small monorepo with violations planted on purpose.</sub>
 
 ## Example
 
@@ -100,11 +106,13 @@ flowchart TB
 
 ### How packages are classified
 
-- **Web app**: depends on Next.js, Remix, Nuxt, SvelteKit, Astro, Angular, Vue, Svelte or React DOM and has a `dev` or `start` script (or lives under `apps/`). A library that depends on React is shown as a component library.
-- **API**: depends on NestJS, Fastify, Express, Hono, Koa, tRPC or GraphQL Yoga.
-- **Worker**: an application that depends on a queue library (BullMQ, KafkaJS, amqplib, pg-boss) or has `worker` or `jobs` in its path.
-- **CLI**: has a `bin` field.
-- **Library**: everything else.
+| Kind | When |
+| --- | --- |
+| Web app | Depends on Next.js, Remix, Nuxt, SvelteKit, Astro, Angular, Vue, Svelte or React DOM and has a `dev` or `start` script, or lives under `apps/`. A library that depends on React is shown as a component library. |
+| API | Depends on NestJS, Fastify, Express, Hono, Koa, tRPC or GraphQL Yoga |
+| Worker | An application that depends on a queue library (BullMQ, KafkaJS, amqplib, pg-boss) or has `worker` or `jobs` in its path |
+| CLI | Has a `bin` field |
+| Library | Everything else |
 
 Override it per package in `package.json`:
 
@@ -113,6 +121,18 @@ Override it per package in `package.json`:
 ```
 
 External systems are detected from client libraries: `pg`, `mysql2`, `mongodb`, `redis`, `ioredis`, `bullmq`, `kafkajs`, `amqplib`, `nodemailer`, `stripe`, `twilio`, LLM SDKs and others. Add your own in the config under `externals`.
+
+## Viewer
+
+```sh
+npx arch-map view            # writes architecture.html
+```
+
+<img src="docs/viewer.png" alt="Viewer: the example monorepo's packages grouped by layer, external systems at the bottom, rule violations as red edges and a list of violations on the right" width="100%">
+
+The page is self-contained (no scripts or fonts loaded from the network). Packages are grouped by layer, or into applications and libraries when there are no layers. Red edges break a rule and amber ones are warnings, dashed grey ones are dependencies that are declared but unused or only used by tests, and dotted ones lead to external systems. Click a package to see what it depends on, what depends on it, the external systems it reaches and its folders; the rest of the graph fades. Clicking a violation selects the package and the edge. It follows the system light or dark theme.
+
+<img src="docs/viewer-detail.png" alt="Viewer in dark mode with the web app selected: its dependencies, the database it reaches through a library, and its two violations" width="100%">
 
 ## Rules
 
@@ -138,6 +158,7 @@ npm install --save-dev github:oebh2408/arch-map
 npx arch-map generate                 # writes docs/architecture.md
 npx arch-map check                    # prints violations, exits 1 on errors
 npx arch-map check --up-to-date docs/architecture.md
+npx arch-map view                     # writes architecture.html
 npx arch-map generate --format structurizr --out docs/workspace.dsl
 ```
 
@@ -193,12 +214,13 @@ jobs:
 ## Library
 
 ```ts
-import { buildModel, checkRules, loadConfig, renderMarkdown } from 'arch-map';
+import { buildModel, checkRules, loadConfig, renderMarkdown, renderViewer } from 'arch-map';
 
 const config = loadConfig('.');
 const model = buildModel('.', config);
 const violations = checkRules(model, config);
 console.log(renderMarkdown(model, config, violations));
+const html = renderViewer(model, config, violations);
 ```
 
 ## Limits
@@ -209,16 +231,22 @@ console.log(renderMarkdown(model, config, violations));
 - Components are folders. Depth is one level below `src/`, `app/` or `lib/`; change it with `componentDepth`.
 - Imports are read with the TypeScript preprocessor, without type checking, so it is fast but does not follow re-exports through barrel files to the original module.
 
+## Design decisions
+
+- [0001 · Generate diagrams from the code, check them in CI](docs/adr/0001-diagrams-from-code.md)
+- [0002 · Workspace packages as C4 containers, folders as components](docs/adr/0002-packages-as-containers.md)
+- [0003 · Read imports with the TypeScript preprocessor](docs/adr/0003-import-scanning-without-type-checking.md)
+
 ## Development
 
-```sh
+```bash
 npm install
 npm test
-npm run build && npm run example    # regenerates examples/shop/docs/architecture.md
+npm run build && npm run example   # regenerates examples/shop/docs/architecture.md
+npm run demo:svg                   # re-renders docs/demo.svg from the real output
+npm run screenshots                # regenerates the viewer images, needs a local Chromium
 ```
-
-Design notes are in [docs/adr](docs/adr).
 
 ## License
 
-MIT
+MIT © [Oscar Benavides](https://ob0.dev)

@@ -6,11 +6,13 @@ import { renderMarkdown } from './markdown.js';
 import { buildModel } from './model.js';
 import { checkRules, RULES } from './rules.js';
 import { renderStructurizr } from './structurizr.js';
+import { renderViewer } from './viewer.js';
 import type { Violation } from './types.js';
 
 const USAGE = `Usage:
   arch-map generate [--out docs/architecture.md] [--format markdown|structurizr|json]
   arch-map check [--format text|github|json] [--up-to-date docs/architecture.md]
+  arch-map view [--out architecture.html]
   arch-map rules
 
 Options:
@@ -84,6 +86,14 @@ function main(argv: string[]): number {
     return code;
   }
 
+  if (command === 'view') {
+    const out = resolve(flags.out ?? 'architecture.html');
+    mkdirSync(dirname(out), { recursive: true });
+    writeFileSync(out, renderViewer(model, config, violations));
+    process.stdout.write(`Wrote ${flags.out ?? 'architecture.html'}: ${model.containers.length} packages, ${violations.length} violation${violations.length === 1 ? '' : 's'}. Open it in a browser.\n`);
+    return 0;
+  }
+
   return fail(`Unknown command '${command}'.\n\n${USAGE}`);
 }
 
@@ -95,9 +105,16 @@ function formatViolations(violations: Violation[], format: string): string {
       .join('\n') + (violations.length ? '\n' : '');
   }
   if (!violations.length) return 'No violations.\n';
-  const lines = violations.map((v) => `${(v.file ? `${v.file}${v.line ? `:${v.line}` : ''}` : '-').padEnd(40)} ${v.severity.padEnd(8)} ${v.message}  ${v.rule}`);
+  const lines: string[] = [];
+  const byFile = new Map<string, Violation[]>();
+  for (const v of violations) byFile.set(v.file ?? '(no file)', [...(byFile.get(v.file ?? '(no file)') ?? []), v]);
+  for (const [file, list] of byFile) {
+    lines.push(file);
+    for (const v of list) lines.push(`  ${String(v.line ?? '').padEnd(5)} ${v.severity.padEnd(8)} ${v.message}  ${v.rule}`);
+    lines.push('');
+  }
   const errors = violations.filter((v) => v.severity === 'error').length;
-  lines.push('', `${errors} error${errors === 1 ? '' : 's'}, ${violations.length - errors} warning${violations.length - errors === 1 ? '' : 's'}`);
+  lines.push(`${errors} error${errors === 1 ? '' : 's'}, ${violations.length - errors} warning${violations.length - errors === 1 ? '' : 's'}`);
   return lines.join('\n') + '\n';
 }
 

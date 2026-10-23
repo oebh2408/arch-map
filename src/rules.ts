@@ -101,7 +101,7 @@ export function checkRules(model: ArchitectureModel, config: Config = {}): Viola
         out.push({
           rule: 'forbidden',
           severity: severity('forbidden') as Severity,
-          message: `${imp.from} imports '${imp.specifier}'${rule.reason ? `: ${rule.reason}` : ` (forbidden: ${rule.from} -> ${rule.to})`}.`,
+          message: `Imports '${imp.specifier}'${rule.reason ? `: ${rule.reason}` : ` (forbidden: ${rule.from} -> ${rule.to})`}.`,
           file: imp.from,
           line: imp.line,
           from: fromPkg,

@@ -219,8 +219,8 @@ flowchart LR
 
 | Rule | Severity | Location | Message |
 | --- | --- | --- | --- |
-| forbidden | error | `apps/api/src/routes/payments.ts:2` | apps/api/src/routes/payments.ts imports '@shop/db': routes call services, services call the database. |
-| forbidden | error | `apps/web/src/app/orders/page.tsx:1` | apps/web/src/app/orders/page.tsx imports '@shop/db': the web app reads data through the API. |
+| forbidden | error | `apps/api/src/routes/payments.ts:2` | Imports '@shop/db': routes call services, services call the database. |
+| forbidden | error | `apps/web/src/app/orders/page.tsx:1` | Imports '@shop/db': the web app reads data through the API. |
 | undeclared-dependency | error | `apps/web/src/app/orders/page.tsx:1` | @shop/web imports @shop/db but does not list it in package.json. |
 | unused-dependency | warning | `apps/worker/package.json` | @shop/worker lists @shop/ui in package.json but never imports it. |
 | cycles | error | `packages/db/src/orders.ts:1` | Dependency cycle: @shop/db -> @shop/domain -> @shop/db. |

@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="901" height="617" viewBox="0 0 901 617" role="img" aria-label="Terminal demo: arch-map writes the architecture document for a small monorepo and finds 5 errors and 1 warning, each with its file and rule">
+<style>
+text{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;font-size:14px}
+@keyframes l0{0%,9.08%{opacity:0}9.88%,94%{opacity:1}100%{opacity:0}}.l0{opacity:0;animation:l0 18s linear infinite}
+@keyframes l2{0%,10.31%{opacity:0}11.11%,94%{opacity:1}100%{opacity:0}}.l2{opacity:0;animation:l2 18s linear infinite}
+@keyframes l3{0%,10.92%{opacity:0}11.72%,94%{opacity:1}100%{opacity:0}}.l3{opacity:0;animation:l3 18s linear infinite}
+@keyframes l4{0%,11.53%{opacity:0}12.33%,94%{opacity:1}100%{opacity:0}}.l4{opacity:0;animation:l4 18s linear infinite}
+@keyframes l5{0%,12.14%{opacity:0}12.94%,94%{opacity:1}100%{opacity:0}}.l5{opacity:0;animation:l5 18s linear infinite}
+@keyframes l7{0%,13.36%{opacity:0}14.16%,94%{opacity:1}100%{opacity:0}}.l7{opacity:0;animation:l7 18s linear infinite}
+@keyframes l8{0%,13.97%{opacity:0}14.77%,94%{opacity:1}100%{opacity:0}}.l8{opacity:0;animation:l8 18s linear infinite}
+@keyframes l9{0%,14.58%{opacity:0}15.38%,94%{opacity:1}100%{opacity:0}}.l9{opacity:0;animation:l9 18s linear infinite}
+@keyframes l10{0%,15.19%{opacity:0}15.99%,94%{opacity:1}100%{opacity:0}}.l10{opacity:0;animation:l10 18s linear infinite}
+@keyframes l12{0%,16.42%{opacity:0}17.22%,94%{opacity:1}100%{opacity:0}}.l12{opacity:0;animation:l12 18s linear infinite}
+@keyframes l13{0%,17.03%{opacity:0}17.83%,94%{opacity:1}100%{opacity:0}}.l13{opacity:0;animation:l13 18s linear infinite}
+@keyframes l14{0%,17.64%{opacity:0}18.44%,94%{opacity:1}100%{opacity:0}}.l14{opacity:0;animation:l14 18s linear infinite}
+@keyframes l16{0%,18.86%{opacity:0}19.66%,94%{opacity:1}100%{opacity:0}}.l16{opacity:0;animation:l16 18s linear infinite}
+@keyframes l17{0%,19.47%{opacity:0}20.27%,94%{opacity:1}100%{opacity:0}}.l17{opacity:0;animation:l17 18s linear infinite}
+@keyframes l19{0%,20.69%{opacity:0}21.49%,94%{opacity:1}100%{opacity:0}}.l19{opacity:0;animation:l19 18s linear infinite}
+@keyframes l20{0%,21.31%{opacity:0}22.11%,94%{opacity:1}100%{opacity:0}}.l20{opacity:0;animation:l20 18s linear infinite}
+@keyframes l21{0%,21.92%{opacity:0}22.72%,94%{opacity:1}100%{opacity:0}}.l21{opacity:0;animation:l21 18s linear infinite}
+@keyframes l23{0%,23.14%{opacity:0}23.94%,94%{opacity:1}100%{opacity:0}}.l23{opacity:0;animation:l23 18s linear infinite}
+@keyframes type{0%{width:0}2%{width:0}6.31%{width:185.45999999999998px}94%{width:185.45999999999998px}100%{width:0}}.type{animation:type 18s steps(22) infinite}
+</style>
+<rect width="901" height="617" rx="14" fill="#05050B"/>
+<rect x="0.5" y="0.5" width="900" height="616" rx="14" fill="none" stroke="#1E1B2E"/>
+<circle cx="24" cy="22" r="5.5" fill="#2A2638"/><circle cx="42" cy="22" r="5.5" fill="#2A2638"/><circle cx="60" cy="22" r="5.5" fill="#2A2638"/>
+<text x="450.5" y="26" text-anchor="middle" fill="#8B86A0" style="font-size:12px">arch-map · examples/shop</text>
+<line x1="0" y1="42" x2="901" y2="42" stroke="#1E1B2E"/>
+<clipPath id="typed"><rect class="type" x="44.86" y="47" height="21" width="0"/></clipPath>
+<text x="28" y="64" xml:space="preserve"><tspan fill="#6FF2C6">$</tspan></text>
+<text x="44.86" y="64" fill="#F4F2EC" clip-path="url(#typed)" xml:space="preserve">npx arch-map generate</text>
+<text class="l0" x="28" y="85" xml:space="preserve"><tspan fill="#8B86A0" >Wrote docs/architecture.md: 7 packages, 4 external systems, 6 violations.</tspan></text>
+<text class="l2" x="28" y="127" xml:space="preserve"><tspan fill="#6FF2C6" >$ </tspan><tspan fill="#F4F2EC" >npx arch-map check</tspan></text>
+<text class="l3" x="28" y="148" xml:space="preserve"><tspan fill="#6FF2C6" >apps/api/src/routes/payments.ts</tspan></text>
+<text class="l4" x="28" y="169" xml:space="preserve"><tspan fill="#8B86A0" >  2     </tspan><tspan fill="#FF7B8A" >error   </tspan><tspan fill="#F4F2EC" >Imports '@shop/db': routes call services, services call the</tspan></text>
+<text class="l5" x="28" y="190" xml:space="preserve"><tspan fill="#8B86A0" >                </tspan><tspan fill="#F4F2EC" >database.</tspan><tspan fill="#8B86A0" >                                                     </tspan><tspan fill="#8B86A0" >forbidden</tspan></text>
+<text class="l7" x="28" y="232" xml:space="preserve"><tspan fill="#6FF2C6" >apps/web/src/app/orders/page.tsx</tspan></text>
+<text class="l8" x="28" y="253" xml:space="preserve"><tspan fill="#8B86A0" >  1     </tspan><tspan fill="#FF7B8A" >error   </tspan><tspan fill="#F4F2EC" >Imports '@shop/db': the web app reads data through the API.</tspan><tspan fill="#8B86A0" >   </tspan><tspan fill="#8B86A0" >forbidden</tspan></text>
+<text class="l9" x="28" y="274" xml:space="preserve"><tspan fill="#8B86A0" >  1     </tspan><tspan fill="#FF7B8A" >error   </tspan><tspan fill="#F4F2EC" >@shop/web imports @shop/db but does not list it in</tspan></text>
+<text class="l10" x="28" y="295" xml:space="preserve"><tspan fill="#8B86A0" >                </tspan><tspan fill="#F4F2EC" >package.json.</tspan><tspan fill="#8B86A0" >                                                 </tspan><tspan fill="#8B86A0" >undeclared-dependency</tspan></text>
+<text class="l12" x="28" y="337" xml:space="preserve"><tspan fill="#6FF2C6" >apps/worker/package.json</tspan></text>
+<text class="l13" x="28" y="358" xml:space="preserve"><tspan fill="#8B86A0" >        </tspan><tspan fill="#F2C46D" >warning </tspan><tspan fill="#F4F2EC" >@shop/worker lists @shop/ui in package.json but never</tspan></text>
+<text class="l14" x="28" y="379" xml:space="preserve"><tspan fill="#8B86A0" >                </tspan><tspan fill="#F4F2EC" >imports it.</tspan><tspan fill="#8B86A0" >                                                   </tspan><tspan fill="#8B86A0" >unused-dependency</tspan></text>
+<text class="l16" x="28" y="421" xml:space="preserve"><tspan fill="#6FF2C6" >packages/db/src/orders.ts</tspan></text>
+<text class="l17" x="28" y="442" xml:space="preserve"><tspan fill="#8B86A0" >  1     </tspan><tspan fill="#FF7B8A" >error   </tspan><tspan fill="#F4F2EC" >Dependency cycle: @shop/db -&gt; @shop/domain -&gt; @shop/db.</tspan><tspan fill="#8B86A0" >       </tspan><tspan fill="#8B86A0" >cycles</tspan></text>
+<text class="l19" x="28" y="484" xml:space="preserve"><tspan fill="#6FF2C6" >packages/domain/src/order.ts</tspan></text>
+<text class="l20" x="28" y="505" xml:space="preserve"><tspan fill="#8B86A0" >  1     </tspan><tspan fill="#FF7B8A" >error   </tspan><tspan fill="#F4F2EC" >@shop/domain (layer Domain) depends on @shop/db (layer Data</tspan></text>
+<text class="l21" x="28" y="526" xml:space="preserve"><tspan fill="#8B86A0" >                </tspan><tspan fill="#F4F2EC" >access), which is above it.</tspan><tspan fill="#8B86A0" >                                   </tspan><tspan fill="#8B86A0" >layers</tspan></text>
+<text class="l23" x="28" y="568" xml:space="preserve"><tspan fill="#FF7B8A" >5 errors</tspan><tspan fill="#8B86A0" >, </tspan><tspan fill="#F2C46D" >1 warning</tspan></text>
+</svg>
