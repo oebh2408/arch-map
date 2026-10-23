@@ -1,0 +1,8 @@
+{
+  "name": "@shop/ui",
+  "description": "Shared React components",
+  "private": true,
+  "main": "src/index.tsx",
+  "peerDependencies": { "react": "^19.0.0" },
+  "devDependencies": { "react-dom": "^19.0.0" }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Shop",
+  "layers": [
+    { "name": "Applications", "packages": ["apps/*"] },
+    { "name": "Data access", "packages": ["packages/db"] },
+    { "name": "Domain", "packages": ["packages/domain"] },
+    { "name": "Shared", "packages": ["packages/config", "packages/ui"] }
+  ],
+  "forbidden": [
+    { "from": "apps/web/**", "to": "packages/db/**", "reason": "the web app reads data through the API" },
+    { "from": "apps/api/src/routes/**", "to": "packages/db/**", "reason": "routes call services, services call the database" }
+  ]
+}

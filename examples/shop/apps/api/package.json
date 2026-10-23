@@ -1,0 +1,7 @@
+{
+  "name": "@shop/api",
+  "description": "Orders, payments and catalog API",
+  "private": true,
+  "scripts": { "start": "node dist/server.js" },
+  "dependencies": { "@shop/config": "*", "@shop/db": "*", "@shop/domain": "*", "fastify": "^5.0.0", "stripe": "^17.0.0" }
+}

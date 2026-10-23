@@ -1,0 +1,7 @@
+{
+  "name": "@shop/db",
+  "description": "Queries and migrations",
+  "private": true,
+  "main": "src/index.ts",
+  "dependencies": { "@shop/config": "*", "@shop/domain": "*", "pg": "^8.13.0" }
+}

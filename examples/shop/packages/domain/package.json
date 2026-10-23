@@ -1,0 +1,7 @@
+{
+  "name": "@shop/domain",
+  "description": "Orders, money and pricing rules",
+  "private": true,
+  "main": "src/index.ts",
+  "dependencies": { "@shop/db": "*" }
+}

@@ -1,0 +1,59 @@
+{
+  "name": "arch-map",
+  "version": "0.1.0",
+  "description": "C4 architecture diagrams generated from a TypeScript monorepo, kept up to date in CI, with dependency and layer rules.",
+  "keywords": [
+    "architecture",
+    "c4",
+    "c4-model",
+    "diagram",
+    "mermaid",
+    "structurizr",
+    "monorepo",
+    "workspaces",
+    "dependency-graph",
+    "typescript",
+    "lint"
+  ],
+  "author": "Oscar Benavides (https://ob0.dev)",
+  "license": "MIT",
+  "homepage": "https://github.com/oebh2408/arch-map#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oebh2408/arch-map.git"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "arch-map": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "example": "node dist/cli.js generate --root examples/shop",
+    "prepare": "npm run build"
+  },
+  "dependencies": {
+    "typescript": "^5.9.3",
+    "yaml": "^2.9.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "vitest": "^5.0.5"
+  }
+}

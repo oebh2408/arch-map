@@ -1,0 +1,6 @@
+{
+  "name": "@shop/config",
+  "description": "Environment settings",
+  "private": true,
+  "main": "src/index.ts"
+}
