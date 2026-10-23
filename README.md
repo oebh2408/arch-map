@@ -1,4 +1,4 @@
-<img src="docs/diagram.jpg" alt="Arch Map: workspace packages and imports go in, rules are checked, a Mermaid architecture document comes out" width="100%">
+<img src="docs/diagram.jpg" alt="Arch Map: workspace packages and imports go in, rules are checked, the diagrams come out in a web interface and a Mermaid document" width="100%">
 
 # arch-map
 
@@ -8,11 +8,44 @@
 
 Architecture diagrams of a monorepo are usually drawn by hand once and then go out of date: a new package is added, the web app starts importing the database layer directly, two libraries end up depending on each other. Nobody notices until the diagram is needed and turns out to be wrong.
 
-arch-map builds the diagrams from the code. It reads the workspace packages, their `package.json` files and every import, and writes `docs/architecture.md` with [C4](https://c4model.com) diagrams in Mermaid, which GitHub renders in place. It also checks rules (cycles, undeclared dependencies, layers, forbidden imports) and a CI step fails when the committed document is out of date, so the diagrams change in the same pull request as the code. `arch-map serve` opens the diagrams in a local web interface that updates as the code changes, and `arch-map view` writes the package graph as a single HTML file.
+arch-map builds the diagrams from the code. It reads the workspace packages, their `package.json` files and every import, and writes `docs/architecture.md` with [C4](https://c4model.com) diagrams in Mermaid, which GitHub renders in place. It also checks rules (cycles, undeclared dependencies, layers, forbidden imports) and a CI step fails when the committed document is out of date, so the diagrams change in the same pull request as the code. While you work, `arch-map serve` shows the same diagrams in a local web interface that updates as the code changes.
 
-<img src="docs/demo.svg" alt="Terminal demo: arch-map writes the architecture document for a small monorepo and finds 5 errors and 1 warning, each with its file and rule" width="100%">
+<img src="docs/app-packages.png" alt="Web interface: the example monorepo's packages grouped by layer, the web app selected with its dependencies, external systems and two violations on the right" width="100%">
 
-<sub>Run on [examples/shop](examples/shop), a small monorepo with violations planted on purpose.</sub>
+<sub>`arch-map serve` on [examples/shop](examples/shop), a small monorepo with violations planted on purpose (`npm run serve:example`).</sub>
+
+## Quick start
+
+In the root of a TypeScript monorepo:
+
+```sh
+npx github:oebh2408/arch-map serve
+```
+
+Open http://localhost:4200. No config is needed to start; layers and rules are added later in [arch-map.config.json](#config). To try it on the example monorepo:
+
+```sh
+git clone https://github.com/oebh2408/arch-map
+cd arch-map
+npm install
+npm run serve:example
+```
+
+## Web interface
+
+```sh
+npx arch-map serve
+```
+
+This starts a local server on http://localhost:4200 with the same model as the generated document: the system context, the containers, the package graph, the components of each package and the rule violations. The overview lists the packages and the external systems they use.
+
+In the package graph (the image at the top), packages are grouped by layer, or into applications and libraries when there are no layers. Red edges break a rule and amber ones are warnings, and dashed grey ones are dependencies that are declared but unused or only used by tests. Click a package to see what it depends on, what depends on it, the external systems it reaches and its folders; the rest of the graph fades. The components view shows the folders of one package, the files in each and the imports between them, with forbidden imports in red. Clicking a violation opens the view where it happens and selects it.
+
+<img src="docs/app-components.png" alt="Web interface in dark mode: the components of the API package, with a forbidden import from the routes folder to the database package" width="100%">
+
+The model is rebuilt when a file in the repository changes (`node_modules`, `.git` and build folders are ignored), so the diagrams follow the code while you work. The server only listens on 127.0.0.1 and rejects requests with a different `Host` header. It follows the system light or dark theme.
+
+`arch-map view` writes the package graph as a single self-contained HTML file (no scripts or fonts loaded from the network), to attach to a pull request or a design document.
 
 ## Example
 
@@ -122,24 +155,6 @@ Override it per package in `package.json`:
 
 External systems are detected from client libraries: `pg`, `mysql2`, `mongodb`, `redis`, `ioredis`, `bullmq`, `kafkajs`, `amqplib`, `nodemailer`, `stripe`, `twilio`, LLM SDKs and others. Add your own in the config under `externals`.
 
-## Web interface
-
-```sh
-npx arch-map serve
-```
-
-This starts a local server on http://localhost:4200 with the same model as the generated document: the system context, the containers, the package graph, the components of each package and the rule violations. The overview lists the packages and the external systems they use.
-
-<img src="docs/app-packages.png" alt="Web interface: the example monorepo's packages grouped by layer, the web app selected with its dependencies, external systems and two violations on the right" width="100%">
-
-In the package graph, packages are grouped by layer, or into applications and libraries when there are no layers. Red edges break a rule and amber ones are warnings, and dashed grey ones are dependencies that are declared but unused or only used by tests. Click a package to see what it depends on, what depends on it, the external systems it reaches and its folders; the rest of the graph fades. The components view shows the folders of one package, the files in each and the imports between them, with forbidden imports in red. Clicking a violation opens the view where it happens and selects it.
-
-<img src="docs/app-components.png" alt="Web interface in dark mode: the components of the API package, with a forbidden import from the routes folder to the database package" width="100%">
-
-The model is rebuilt when a file in the repository changes (`node_modules`, `.git` and build folders are ignored), so the diagrams follow the code while you work. The server only listens on 127.0.0.1 and rejects requests with a different `Host` header. It follows the system light or dark theme.
-
-`arch-map view` writes the package graph as a single self-contained HTML file (no scripts or fonts loaded from the network), to attach to a pull request or a design document.
-
 ## Rules
 
 | Rule | Default | What it finds |
@@ -168,6 +183,10 @@ npx arch-map serve                    # web interface on http://localhost:4200
 npx arch-map view                     # writes architecture.html
 npx arch-map generate --format structurizr --out docs/workspace.dsl
 ```
+
+<img src="docs/demo.svg" alt="Terminal demo: arch-map writes the architecture document for a small monorepo and finds 5 errors and 1 warning, each with its file and rule" width="100%">
+
+<sub>Run on [examples/shop](examples/shop), a small monorepo with violations planted on purpose.</sub>
 
 Workspaces are read from `package.json` (`workspaces`, as used by npm, yarn and bun) or `pnpm-workspace.yaml`. A repository without workspaces is treated as one package. Path aliases from `tsconfig.base.json` or `tsconfig.json` are resolved.
 
@@ -253,7 +272,7 @@ npm install
 npm test
 npm run build && npm run example   # regenerates examples/shop/docs/architecture.md
 npm run demo:svg                   # re-renders docs/demo.svg from the real output
-npm run build && node dist/cli.js serve examples/shop
+npm run serve:example             # web interface on examples/shop
 npm run screenshots                # regenerates the interface images, needs a local Chromium
 ```
 

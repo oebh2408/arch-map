@@ -46,6 +46,7 @@
     "build": "tsc",
     "test": "vitest run",
     "example": "node dist/cli.js generate --root examples/shop",
+    "serve:example": "npm run build && node dist/cli.js serve --root examples/shop",
     "view:example": "node dist/cli.js view --root examples/shop --out example.html",
     "demo:svg": "npm run build && node scripts/render-demo.mjs",
     "screenshots": "npm run build && node scripts/screenshots.mjs",
