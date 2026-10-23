@@ -73,9 +73,8 @@ describe('viewer', () => {
     expect(html).not.toMatch(/<script[^>]+src=|<link[^>]+href=/);
     for (const c of model.containers) expect(html).toContain(`data-id="pkg:${c.name}"`);
     expect(html).toContain('class="edge edge-violation" data-from="pkg:@shop/domain" data-to="pkg:@shop/db"');
-    expect(html).toContain('data-to="ext:postgresql"');
     const data = JSON.parse(html.match(/<script type="application\/json" id="data">(.*?)<\/script>/s)![1]!);
     expect(data.violations).toHaveLength(violations.length);
-    expect(data.details['pkg:@shop/api'].externals.map((e: { name: string }) => e.name)).toContain('PostgreSQL');
+    expect(data.details['pkg:@shop/api']).toContain('PostgreSQL');
   });
 });

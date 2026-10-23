@@ -8,7 +8,7 @@
 
 Architecture diagrams of a monorepo are usually drawn by hand once and then go out of date: a new package is added, the web app starts importing the database layer directly, two libraries end up depending on each other. Nobody notices until the diagram is needed and turns out to be wrong.
 
-arch-map builds the diagrams from the code. It reads the workspace packages, their `package.json` files and every import, and writes `docs/architecture.md` with [C4](https://c4model.com) diagrams in Mermaid, which GitHub renders in place. It also checks rules (cycles, undeclared dependencies, layers, forbidden imports) and a CI step fails when the committed document is out of date, so the diagrams change in the same pull request as the code. `arch-map view` writes an interactive version of the package graph as a single HTML file.
+arch-map builds the diagrams from the code. It reads the workspace packages, their `package.json` files and every import, and writes `docs/architecture.md` with [C4](https://c4model.com) diagrams in Mermaid, which GitHub renders in place. It also checks rules (cycles, undeclared dependencies, layers, forbidden imports) and a CI step fails when the committed document is out of date, so the diagrams change in the same pull request as the code. `arch-map serve` opens the diagrams in a local web interface that updates as the code changes, and `arch-map view` writes the package graph as a single HTML file.
 
 <img src="docs/demo.svg" alt="Terminal demo: arch-map writes the architecture document for a small monorepo and finds 5 errors and 1 warning, each with its file and rule" width="100%">
 
@@ -122,17 +122,23 @@ Override it per package in `package.json`:
 
 External systems are detected from client libraries: `pg`, `mysql2`, `mongodb`, `redis`, `ioredis`, `bullmq`, `kafkajs`, `amqplib`, `nodemailer`, `stripe`, `twilio`, LLM SDKs and others. Add your own in the config under `externals`.
 
-## Viewer
+## Web interface
 
 ```sh
-npx arch-map view            # writes architecture.html
+npx arch-map serve
 ```
 
-<img src="docs/viewer.png" alt="Viewer: the example monorepo's packages grouped by layer, external systems at the bottom, rule violations as red edges and a list of violations on the right" width="100%">
+This starts a local server on http://localhost:4200 with the same model as the generated document: the system context, the containers, the package graph, the components of each package and the rule violations. The overview lists the packages and the external systems they use.
 
-The page is self-contained (no scripts or fonts loaded from the network). Packages are grouped by layer, or into applications and libraries when there are no layers. Red edges break a rule and amber ones are warnings, dashed grey ones are dependencies that are declared but unused or only used by tests, and dotted ones lead to external systems. Click a package to see what it depends on, what depends on it, the external systems it reaches and its folders; the rest of the graph fades. Clicking a violation selects the package and the edge. It follows the system light or dark theme.
+<img src="docs/app-packages.png" alt="Web interface: the example monorepo's packages grouped by layer, the web app selected with its dependencies, external systems and two violations on the right" width="100%">
 
-<img src="docs/viewer-detail.png" alt="Viewer in dark mode with the web app selected: its dependencies, the database it reaches through a library, and its two violations" width="100%">
+In the package graph, packages are grouped by layer, or into applications and libraries when there are no layers. Red edges break a rule and amber ones are warnings, and dashed grey ones are dependencies that are declared but unused or only used by tests. Click a package to see what it depends on, what depends on it, the external systems it reaches and its folders; the rest of the graph fades. The components view shows the folders of one package, the files in each and the imports between them, with forbidden imports in red. Clicking a violation opens the view where it happens and selects it.
+
+<img src="docs/app-components.png" alt="Web interface in dark mode: the components of the API package, with a forbidden import from the routes folder to the database package" width="100%">
+
+The model is rebuilt when a file in the repository changes (`node_modules`, `.git` and build folders are ignored), so the diagrams follow the code while you work. The server only listens on 127.0.0.1 and rejects requests with a different `Host` header. It follows the system light or dark theme.
+
+`arch-map view` writes the package graph as a single self-contained HTML file (no scripts or fonts loaded from the network), to attach to a pull request or a design document.
 
 ## Rules
 
@@ -158,6 +164,7 @@ npm install --save-dev github:oebh2408/arch-map
 npx arch-map generate                 # writes docs/architecture.md
 npx arch-map check                    # prints violations, exits 1 on errors
 npx arch-map check --up-to-date docs/architecture.md
+npx arch-map serve                    # web interface on http://localhost:4200
 npx arch-map view                     # writes architecture.html
 npx arch-map generate --format structurizr --out docs/workspace.dsl
 ```
@@ -223,6 +230,8 @@ console.log(renderMarkdown(model, config, violations));
 const html = renderViewer(model, config, violations);
 ```
 
+`serve` and `createArchMapApp` start the web interface or return its request handler. `packagesView`, `contextView`, `containersView`, `componentsView` and `layout` return the views it draws, laid out as SVG.
+
 ## Limits
 
 - Dependencies come from imports and `package.json`. Calls between deployed services over HTTP or queues are not visible in imports, so the container diagram does not draw edges between containers.
@@ -244,7 +253,8 @@ npm install
 npm test
 npm run build && npm run example   # regenerates examples/shop/docs/architecture.md
 npm run demo:svg                   # re-renders docs/demo.svg from the real output
-npm run screenshots                # regenerates the viewer images, needs a local Chromium
+npm run build && node dist/cli.js serve examples/shop
+npm run screenshots                # regenerates the interface images, needs a local Chromium
 ```
 
 ## License

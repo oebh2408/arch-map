@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { dirname, relative, resolve } from 'node:path';
 import { loadConfig } from './config.js';
 import { renderMarkdown } from './markdown.js';
 import { buildModel } from './model.js';
 import { checkRules, RULES } from './rules.js';
 import { renderStructurizr } from './structurizr.js';
+import { serve } from './server.js';
 import { renderViewer } from './viewer.js';
 import type { Violation } from './types.js';
 
@@ -13,11 +14,13 @@ const USAGE = `Usage:
   arch-map generate [--out docs/architecture.md] [--format markdown|structurizr|json]
   arch-map check [--format text|github|json] [--up-to-date docs/architecture.md]
   arch-map view [--out architecture.html]
+  arch-map serve [--port 4200]
   arch-map rules
 
 Options:
   --root <dir>      Repository root (default: current directory)
   --config <file>   Config file (default: arch-map.config.json in the root)
+  --port <n>        Port for serve (default 4200). It listens on 127.0.0.1 only.
 `;
 
 function parseArgs(argv: string[]) {
@@ -45,6 +48,19 @@ function main(argv: string[]): number {
   }
 
   const root = resolve(flags.root ?? '.');
+  if (command === 'serve') {
+    void serve({ root, config: flags.config ? resolve(flags.config) : undefined, port: flags.port ? Number(flags.port) : undefined })
+      .then((server) => {
+        const address = server.address();
+        const port = typeof address === 'object' && address ? address.port : flags.port;
+        process.stdout.write(`arch-map on http://localhost:${port}, watching ${relative(process.cwd(), root) || '.'}. Ctrl+C to stop.\n`);
+      })
+      .catch((err: Error) => {
+        process.stderr.write(`arch-map: ${err.message}\n`);
+        process.exitCode = 2;
+      });
+    return 0;
+  }
   const config = loadConfig(root, flags.config ? resolve(flags.config) : undefined);
   const model = buildModel(root, config);
   const violations = checkRules(model, config);

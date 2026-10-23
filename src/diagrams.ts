@@ -194,7 +194,7 @@ function externalNode(e: ExternalSystem): string {
   return `${id('ext', e.id)}${open}"<b>${esc(e.name)}</b><br/>${e.kind}"${close}:::external`;
 }
 
-function verb(e: ExternalSystem): string {
+export function verb(e: ExternalSystem): string {
   switch (e.kind) {
     case 'database':
       return 'Reads and writes';
